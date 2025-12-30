@@ -15,8 +15,24 @@ class TaskStatusResponseDTO
         $this->data = $data;
     }
 
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
     /**
      * Convert the DTO to an array representation
+     *
      * @return array<string,mixed>
      */
     public function toArray(): array
