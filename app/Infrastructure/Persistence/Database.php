@@ -8,15 +8,16 @@ use PDOException;
 
 class Database implements DatabaseInterface
 {
-    private static ?PDO $connection = null;
+    private PDO $connection;
+
+    public function __construct()
+    {
+        $this->connection = $this->createConnection();
+    }
 
     public function getConnection(): PDO
     {
-        if (self::$connection === null) {
-            self::$connection = $this->createConnection();
-        }
-
-        return self::$connection;
+        return $this->connection;
     }
 
     private function createConnection(): PDO
@@ -54,21 +55,21 @@ class Database implements DatabaseInterface
 
     public function beginTransaction(): bool
     {
-        return $this->getConnection()->beginTransaction();
+        return $this->connection->beginTransaction();
     }
 
     public function commit(): bool
     {
-        return $this->getConnection()->commit();
+        return $this->connection->commit();
     }
 
     public function rollback(): bool
     {
-        return $this->getConnection()->rollBack();
+        return $this->connection->rollBack();
     }
 
     public function inTransaction(): bool
     {
-        return $this->getConnection()->inTransaction();
+        return $this->connection->inTransaction();
     }
 }

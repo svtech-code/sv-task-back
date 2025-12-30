@@ -2,11 +2,18 @@
 
 use Dotenv\Dotenv;
 use App\Application\UseCases\TaskStatusUseCase;
+use App\Application\UseCases\UserRegistrationUseCase;
+use App\Application\UseCases\EmailVerificationUseCase;
 use App\Infrastructure\Persistence\Database;
+use App\Infrastructure\Services\EmailService;
 use App\Presentation\Http\FlightRequest;
 use App\Presentation\Http\FlightResponse;
 use App\Infrastructure\Persistence\TaskStatusRepository;
+use App\Infrastructure\Persistence\UserRepository;
+use App\Infrastructure\Persistence\UserEmailVerificationRepository;
 use App\Presentation\Controllers\TaskStatusController;
+use App\Presentation\Controllers\UserRegistrationController;
+use App\Presentation\Controllers\EmailVerificationController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
@@ -23,36 +30,43 @@ $dotenv->required([
     'JWT_EXPIRATION'
 ]);
 
-$container = [];
+// Registro de servicios usando Flight DI Container
+// Usamos nombres únicos para evitar conflictos con servicios internos de Flight
 
-$container['database'] = function () {
-    return new Database();
-};
+// Servicios de infraestructura
+Flight::register('database', Database::class);
+Flight::register('emailService', EmailService::class);
+Flight::register('appRequest', FlightRequest::class);
+Flight::register('appResponse', FlightResponse::class);
 
-$container['request'] = function () {
-    return new FlightRequest();
-};
+// Repositorios
+Flight::register('taskStatusRepository', TaskStatusRepository::class, [Flight::database()]);
+Flight::register('userRepository', UserRepository::class, [Flight::database()]);
+Flight::register('userEmailVerificationRepository', UserEmailVerificationRepository::class, [Flight::database()]);
 
-$container['response'] = function () {
-    return new FlightResponse();
-};
+// Casos de uso
+Flight::register('taskStatusUseCase', TaskStatusUseCase::class, [Flight::taskStatusRepository()]);
+Flight::register('userRegistrationUseCase', UserRegistrationUseCase::class, [
+    Flight::userRepository(),
+    Flight::userEmailVerificationRepository(),
+    Flight::emailService()
+]);
+Flight::register('emailVerificationUseCase', EmailVerificationUseCase::class, [
+    Flight::userRepository(),
+    Flight::userEmailVerificationRepository(),
+    Flight::emailService()
+]);
 
-
-$container['taskStatusRepository'] = function () use ($container) {
-    return new TaskStatusRepository($container['database']());
-};
-
-$container['taskStatusUseCase'] = function () use ($container) {
-    return new TaskStatusUseCase($container['taskStatusRepository']());
-};
-
-$container['taskStatusController'] = function () use ($container) {
-    return new TaskStatusController(
-        $container['taskStatusUseCase'](),
-        $container['response']()
-    );
-};
-
-Flight::map('taskStatusController', $container['taskStatusController']);
-
-return $container;
+// Controladores
+Flight::register('taskStatusController', TaskStatusController::class, [
+    Flight::taskStatusUseCase(),
+    Flight::appResponse()
+]);
+Flight::register('userRegistrationController', UserRegistrationController::class, [
+    Flight::userRegistrationUseCase(),
+    Flight::appResponse()
+]);
+Flight::register('emailVerificationController', EmailVerificationController::class, [
+    Flight::emailVerificationUseCase(),
+    Flight::appResponse()
+]);
