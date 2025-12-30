@@ -37,6 +37,12 @@ class TaskStatusRepository implements TaskStatusRepositoryInterface
         }
     }
 
+    /**
+     * Map database row data to TaskStatus entity
+     *
+     * @param array<string,mixed> $row Database row data
+     * @return TaskStatus
+     */
     private function mapToEntity(array $row): TaskStatus
     {
         return new TaskStatus(

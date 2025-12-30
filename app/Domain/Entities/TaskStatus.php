@@ -23,6 +23,10 @@ class TaskStatus
         return $this->desc_task_status;
     }
 
+    /**
+     * Convert the entity to an array representation
+     * @return array<string,mixed>
+     */
     public function toArray(): array
     {
         return [
