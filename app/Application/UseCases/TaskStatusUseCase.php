@@ -19,13 +19,21 @@ class TaskStatusUseCase
         try {
             $responseTaskStatus = $this->taskStatusRepository->findAll();
 
-            $response = array_map(function($taskStatus) {
+            $response = array_map(function ($taskStatus) {
                 return $taskStatus->toArray();
             }, $responseTaskStatus);
 
-            return new TaskStatusResponseDTO(true, 'Estados de las tareas obtenidas de manera exitosa', ['taskStatus' => $response]);
+            return new TaskStatusResponseDTO(
+                true,
+                'Estados de las tareas obtenidas de manera exitosa',
+                ['taskStatus' => $response]
+            );
         } catch (\Exception $e) {
-            return new TaskStatusResponseDTO(false, 'Error al obtener los estados de las tareas: ' . $e->getMessage());
+            return new TaskStatusResponseDTO(
+                false,
+                'Error al obtener los estados de las tareas: ' . $e->getMessage(),
+                null
+            );
         }
     }
 }
