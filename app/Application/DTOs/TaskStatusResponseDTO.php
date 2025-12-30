@@ -15,6 +15,10 @@ class TaskStatusResponseDTO
         $this->data = $data;
     }
 
+    /**
+     * Convert the DTO to an array representation
+     * @return array<string,mixed>
+     */
     public function toArray(): array
     {
         $response = [
