@@ -11,5 +11,9 @@ class Router
         if (file_exists("$routesPath/task-status.php")) {
             require_once "$routesPath/task-status.php";
         }
+
+        if (file_exists("$routesPath/user-registration.php")) {
+            require_once "$routesPath/user-registration.php";
+        }
     }
 }
